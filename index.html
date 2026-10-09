@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101713">
+<meta name="description" content="Control personal de ingresos, gastos y ahorro.">
+<link rel="manifest" href="manifest.json">
+<title>Mi Bolsillo</title>
+<style>
+:root{color-scheme:dark;--bg:#101713;--panel:#19231d;--panel2:#202d25;--text:#f0f5f1;--muted:#aab8ae;--green:#8ce0b0;--red:#ff9d9d;--line:#304238}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:760px;margin:auto;padding:18px 15px 35px}.top{display:flex;align-items:center;gap:12px;margin:8px 0 20px}.logo{background:#234936;color:var(--green);border-radius:16px;width:52px;height:52px;display:grid;place-items:center;font-size:26px}.top h1{font-size:23px;margin:0}.sub{color:var(--muted);font-size:13px}.pill{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:6px 9px;font-size:11px;color:var(--green)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:12px}.metric small{display:block;color:var(--muted);margin-bottom:8px}.metric strong{font-size:23px;overflow-wrap:anywhere}.metric .hint{font-size:12px;color:var(--muted);margin-top:5px}.section-title{font-size:17px;margin:2px 0 12px}label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}input,select,textarea{width:100%;background:#101713;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:12px;font:inherit;min-height:44px}button{border:0;border-radius:12px;padding:12px 14px;background:var(--green);color:#102117;font-weight:700;font:inherit;cursor:pointer;min-height:44px}button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}button.danger{background:#482929;color:#ffdcdc}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.movement{display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding:12px 0}.movement:first-child{border-top:0}.dot{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:var(--panel2)}.mtext{flex:1;min-width:0}.mtext strong{display:block;overflow-wrap:anywhere}.mtext small{color:var(--muted)}.amount{font-weight:700;white-space:nowrap}.income{color:var(--green)}.expense{color:var(--red)}.empty{color:var(--muted);font-size:14px;padding:12px 0}.reminder{padding:12px 0;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}.reminder:first-of-type{border-top:0}.reminder div{flex:1}.reminder small{display:block;color:var(--muted);margin-top:3px}.notice{font-size:12px;color:var(--muted);line-height:1.5}.bar{height:8px;background:#101713;border-radius:999px;overflow:hidden;margin-top:10px}.bar span{display:block;height:100%;background:var(--green);width:0}.tabs{display:flex;gap:7px;margin:0 0 14px;overflow:auto}.tabs button{white-space:nowrap}.footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
+@media(min-width:600px){main{padding:28px}.metric strong{font-size:27px}}
+</style>
+</head>
+<body><main>
+<header class="top"><div class="logo">₡</div><div><h1>Mi Bolsillo</h1><div class="sub">Tu dinero, bajo control</div></div><div class="pill">EN ESTE DISPOSITIVO</div></header>
+<section class="grid">
+ <div class="card metric"><small>Saldo actual</small><strong id="balance">$0</strong><div class="hint">Ingresos menos gastos</div></div>
+ <div class="card metric"><small>Ahorro registrado</small><strong id="savings">$0</strong><div class="hint">Movimientos de ahorro</div></div>
+ <div class="card metric"><small>Ingresos este mes</small><strong id="monthIn">$0</strong></div>
+ <div class="card metric"><small>Gastos este mes</small><strong id="monthOut">$0</strong></div>
+</section>
+<section class="card">
+ <h2 class="section-title">Registrar movimiento</h2>
+ <form id="movementForm">
+  <div class="formgrid"><div><label for="kind">Tipo</label><select id="kind"><option value="expense">Gasto</option><option value="income">Ingreso</option><option value="saving">Ahorro</option></select></div><div><label for="amount">Valor (COP)</label><input id="amount" type="number" min="1" step="1" placeholder="Ej. 7100" required></div></div>
+  <label for="category">Categoría</label><select id="category"><option>Transporte</option><option>Comida</option><option>Datos móviles</option><option>Computador</option><option>Estudio</option><option>Hogar</option><option>Entretenimiento</option><option>Ahorro</option><option>Salario / ingreso</option><option>Otro</option></select>
+  <label for="description">Descripción (opcional)</label><input id="description" maxlength="90" placeholder="Ej. TransMilenio del lunes">
+  <label for="date">Fecha</label><input id="date" type="date" required>
+  <div class="actions"><button type="submit">Guardar movimiento</button><button class="secondary" type="button" id="clearForm">Limpiar</button></div>
+ </form>
+</section>
+<section class="card">
+ <h2 class="section-title">Presupuesto semanal</h2>
+ <label for="weeklyIncome">Ingreso esperado por fin de semana (COP)</label><input id="weeklyIncome" type="number" min="0" step="1000">
+ <label for="weeklyBudget">Límite de gastos por semana (COP)</label><input id="weeklyBudget" type="number" min="0" step="1000">
+ <div class="bar"><span id="budgetBar"></span></div><p id="budgetText" class="notice"></p>
+ <button id="saveBudget" class="secondary">Guardar presupuesto</button>
+</section>
+<section class="card">
+ <h2 class="section-title">Pagos y recordatorios</h2>
+ <div class="reminder"><div><strong>Cuota del computador</strong><small id="computerText">$160.000 · día 20 de cada mes</small></div><button class="secondary" data-reminder="computer">Editar</button></div>
+ <div class="reminder"><div><strong>Paquete de datos</strong><small id="dataText">$34.000 · mensual</small></div><button class="secondary" data-reminder="data">Editar</button></div>
+ <div class="reminder"><div><strong>Transporte</strong><small id="transportText">$7.100 por día · 6 días/semana</small></div><button class="secondary" data-reminder="transport">Editar</button></div>
+ <div class="actions"><button id="enableNotifications">Activar notificaciones</button><button id="checkReminders" class="secondary">Revisar pagos</button></div>
+ <p class="notice">Importante: en esta versión web, los avisos locales no están garantizados si el navegador está cerrado. Para recordatorios fiables a cualquier hora se necesita una app Android compilada con permisos y alarmas configuradas.</p>
+</section>
+<section class="card">
+ <h2 class="section-title">Historial</h2>
+ <div class="tabs"><button class="secondary" data-filter="all">Todos</button><button class="secondary" data-filter="income">Ingresos</button><button class="secondary" data-filter="expense">Gastos</button><button class="secondary" data-filter="saving">Ahorro</button></div>
+ <div id="history"></div>
+ <div class="actions"><button class="secondary" id="exportData">Exportar copia (.json)</button><button class="secondary" id="importButton">Importar copia</button><button class="danger" id="resetData">Borrar todos los datos</button><input id="importFile" type="file" accept="application/json" hidden></div>
+</section>
+<p class="footer">Mi Bolsillo · Guarda los datos localmente en este navegador. Exporta una copia periódicamente para no perderlos.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n||0);
+const today=()=>new Date().toLocaleDateString('en-CA');
+let state={moves:[],settings:{weeklyIncome:120000,weeklyBudget:50000,computer:160000,data:34000,transport:7100,transportDays:6},filter:'all'};
+function load(){try{const s=JSON.parse(localStorage.getItem('miBolsilloV1'));if(s&&Array.isArray(s.moves)){state={...state,...s,settings:{...state.settings,...s.settings}}}}catch(e){}}
+function persist(){localStorage.setItem('miBolsilloV1',JSON.stringify(state));render()}
+function monthMoves(){const m=today().slice(0,7);return state.moves.filter(x=>x.date&&x.date.slice(0,7)===m)}
+function render(){
+ const totalIn=state.moves.filter(x=>x.kind==='income').reduce((a,x)=>a+x.amount,0);
+ const totalOut=state.moves.filter(x=>x.kind==='expense').reduce((a,x)=>a+x.amount,0);
+ const sav=state.moves.filter(x=>x.kind==='saving').reduce((a,x)=>a+x.amount,0);
+ $('balance').textContent=money(totalIn-totalOut-sav);$('savings').textContent=money(sav);
+ $('monthIn').textContent=money(monthMoves().filter(x=>x.kind==='income').reduce((a,x)=>a+x.amount,0));
+ $('monthOut').textContent=money(monthMoves().filter(x=>x.kind==='expense').reduce((a,x)=>a+x.amount,0));
+ $('weeklyIncome').value=state.settings.weeklyIncome;$('weeklyBudget').value=state.settings.weeklyBudget;
+ $('computerText').textContent=money(state.settings.computer)+' · día 20 de cada mes';
+ $('dataText').textContent=money(state.settings.data)+' · mensual';$('transportText').textContent=money(state.settings.transport)+' por día · '+state.settings.transportDays+' días/semana';
+ const weekStart=new Date();weekStart.setDate(weekStart.getDate()-((weekStart.getDay()+6)%7));weekStart.setHours(0,0,0,0);
+ const weekOut=state.moves.filter(x=>x.kind==='expense'&&new Date(x.date+'T12:00:00')>=weekStart).reduce((a,x)=>a+x.amount,0);
+ const pct=state.settings.weeklyBudget?Math.min(100,weekOut/state.settings.weeklyBudget*100):0;$('budgetBar').style.width=pct+'%';
+ $('budgetText').textContent=`Gastos registrados esta semana: ${money(weekOut)} de ${money(state.settings.weeklyBudget)}. Ingreso semanal esperado: ${money(state.settings.weeklyIncome)}.`;
+ const filtered=state.moves.filter(x=>state.filter==='all'||x.kind===state.filter).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.id-a.id);
+ $('history').innerHTML=filtered.length?filtered.map(x=>`<div class="movement"><div class="dot">${x.kind==='income'?'↙':x.kind==='saving'?'◈':'↗'}</div><div class="mtext"><strong>${escapeHtml(x.description||x.category)}</strong><small>${escapeHtml(x.category)} · ${x.date}</small></div><div class="amount ${x.kind==='income'?'income':x.kind==='expense'?'expense':''}">${x.kind==='income'?'+':x.kind==='expense'?'−':'⇢'}${money(x.amount)}</div><button class="secondary" aria-label="Eliminar" data-delete="${x.id}">×</button></div>`).join(''):'<div class="empty">Todavía no hay movimientos. Registra el primero arriba.</div>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('date').value=today();
+$('movementForm').addEventListener('submit',e=>{e.preventDefault();const amount=Number($('amount').value);if(!Number.isFinite(amount)||amount<=0)return;state.moves.push({id:Date.now(),kind:$('kind').value,amount,category:$('category').value,description:$('description').value.trim(),date:$('date').value||today()});$('amount').value='';$('description').value='';persist()});
+$('clearForm').onclick=()=>{$('movementForm').reset();$('date').value=today()};
+$('saveBudget').onclick=()=>{state.settings.weeklyIncome=Math.max(0,Number($('weeklyIncome').value)||0);state.settings.weeklyBudget=Math.max(0,Number($('weeklyBudget').value)||0);persist();alert('Presupuesto guardado.')};
+document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;render()});
+$('history').addEventListener('click',e=>{const b=e.target.closest('[data-delete]');if(!b)return;if(confirm('¿Eliminar este movimiento?')){state.moves=state.moves.filter(x=>x.id!==Number(b.dataset.delete));persist()}});
+document.querySelectorAll('[data-reminder]').forEach(b=>b.onclick=()=>{const k=b.dataset.reminder;const labels={computer:'Cuota del computador',data:'Paquete de datos',transport:'Costo de transporte por día'};const current=state.settings[k];const val=prompt('Nuevo valor para '+labels[k]+' (COP):',String(current));if(val===null)return;const n=Number(val);if(!Number.isFinite(n)||n<0){alert('Escribe un valor válido.');return}state.settings[k]=n;persist()});
+$('exportData').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mi-bolsillo-copia-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('importButton').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.moves)||!d.settings)throw Error();if(confirm('Importar esta copia reemplazará los datos actuales. ¿Continuar?')){state={...state,...d,settings:{...state.settings,...d.settings}};persist();alert('Copia importada.')}}catch(err){alert('No se pudo leer esa copia.')}e.target.value=''};
+$('resetData').onclick=()=>{if(confirm('¿Seguro? Se borrarán todos los movimientos y ajustes de este navegador. Exporta una copia antes si la necesitas.')){state.moves=[];persist()}};
+$('enableNotifications').onclick=async()=>{if(!('Notification'in window)){alert('Este navegador no ofrece notificaciones web.');return}try{const p=await Notification.requestPermission();alert(p==='granted'?'Permiso concedido. Los avisos siguen dependiendo de que el navegador permita ejecutar la app.':'No se concedió el permiso. Puedes activarlo en los ajustes del navegador.')}catch(e){alert('No se pudieron activar las notificaciones en este navegador.')}};
+$('checkReminders').onclick=()=>{const now=new Date();const day=now.getDate();const msgs=[];if(day>=18&&day<=20)msgs.push('Recuerda reservar '+money(state.settings.computer)+' para la cuota del computador (día 20).');if(day===1||day===2)msgs.push('Revisa tu paquete de datos: '+money(state.settings.data)+' al mes.');if(!msgs.length)msgs.push('No hay pagos configurados para hoy. Próxima cuota del computador: día 20.');alert(msgs.join('\\n\\n'))};
+load();render();
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
